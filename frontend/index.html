@@ -1,0 +1,202 @@
+<title>DIU Bus Buddy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+
+<header class="bar"><div class="wrap">
+  <div class="logo"><span class="logo-mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3a2b00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="3"/><path d="M3 11h18M7 17v2M17 17v2"/><circle cx="7.5" cy="14" r=".6" fill="#3a2b00"/><circle cx="16.5" cy="14" r=".6" fill="#3a2b00"/></svg></span>DIU Bus Buddy</div>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Choose a view" hidden>
+    <button class="tab" role="tab" data-view="student">Student</button>
+    <button class="tab" role="tab" data-view="driver">Driver</button>
+    <button class="tab" role="tab" data-view="admin">Admin</button>
+  </nav>
+  <span class="userchip" id="userChip" hidden><span id="userName"></span><button class="btn ghost sm" id="logoutBtn" type="button">Log out</button></span>
+  <button class="iconbtn" id="themeBtn" aria-label="Switch light or dark theme" title="Switch theme">◐</button>
+</div></header>
+
+<main class="wrap">
+  <section class="hero" id="hero">
+    <span class="pill sun">Sign in with your university account</span>
+    <h1>Know where your university bus is before you leave home.</h1>
+    <p>Pick a route, see the bus on the map, check how full it is and get delay notices. Drivers and transport managers sign in to their own tools on the same page. Bus data shown here is sample data for the prototype.</p>
+  </section>
+
+  <!-- LOGIN -->
+  <section id="loginView" aria-label="Log in">
+    <div class="card login">
+      <div class="tabs" role="tablist" aria-label="Log in or sign up"><button class="mtab" type="button" role="tab" id="modeLogin" aria-selected="true">Log in</button><button class="mtab" type="button" role="tab" id="modeSignup" aria-selected="false">Sign up</button></div>
+      <form class="form" id="loginForm">
+        <label for="lgId">Mobile number or university ID<input id="lgId" autocomplete="username" placeholder="01712345678 or student01"></label>
+        <label for="lgPw">Password<input id="lgPw" type="password" autocomplete="current-password" placeholder="Your password"></label>
+        <p class="pill bad" id="lgErr" role="alert" hidden></p>
+        <button class="btn" type="submit">Log in</button>
+      </form>
+      <form class="form" id="signupForm" hidden novalidate>
+        <div style="display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))">
+          <label for="suFirst">First name<input id="suFirst" autocomplete="given-name"></label>
+          <label for="suLast">Last name<input id="suLast" autocomplete="family-name"></label>
+        </div>
+        <label for="suMobile">Mobile number<input id="suMobile" type="tel" inputmode="tel" autocomplete="tel" placeholder="01712345678"></label>
+        <label for="suPw">Password<input id="suPw" type="password" autocomplete="new-password" placeholder="At least 8 characters"></label>
+        <label for="suPw2">Confirm password<input id="suPw2" type="password" autocomplete="new-password"></label>
+        <p class="pill bad" id="suErr" role="alert" hidden></p>
+        <button class="btn" type="submit">Create account</button>
+      </form>
+      <div id="demoBox">
+        <p class="small muted" style="margin-bottom:8px">Demo accounts for this prototype. Tap one to fill the form.</p>
+        <div class="demo" id="demoAcc">
+          <button class="btn ghost sm" type="button" data-acc="student01">Student</button>
+          <button class="btn ghost sm" type="button" data-acc="driver07">Driver</button>
+          <button class="btn ghost sm" type="button" data-acc="admin">Admin</button>
+        </div>
+      </div>
+      <p class="small muted">These sign-ins are checked in the browser for the demo only, and accounts you create stay in this browser. The real system will hash passwords and verify users on the server with JWT.</p>
+    </div>
+  </section>
+
+  <!-- STUDENT -->
+  <section class="view" id="view-student" aria-label="Student view">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-head"><h2>Choose your route</h2><span class="muted small">Tap a route to see its bus</span></div>
+      <div class="chips" id="routeChips"></div>
+    </div>
+    <div class="grid">
+      <div class="stack">
+        <div class="card">
+          <div class="card-head"><h2 id="mapTitle">Live bus map</h2><span id="busState" class="pill good">Moving</span></div>
+          <svg class="map" id="map" viewBox="0 0 640 360" role="img" aria-label="Map showing the selected bus route and the bus position"></svg>
+          <div class="row small muted" style="margin-top:10px"><span>Sample positions move in real time for the demo.</span><span>Campus: DIU Birulia</span></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Today's departures</h2><span class="muted small" id="depNote"></span></div>
+          <div class="times" id="times"></div>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <label for="stopSel">Where will you get on?</label>
+          <select id="stopSel"></select>
+          <div style="margin-top:16px" class="eta"><span class="eta-big num" id="etaBig">–</span><span class="muted" id="etaUnit"></span></div>
+          <p class="muted small" id="etaNote" style="margin-top:4px"></p>
+          <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+          <div class="row"><b>How full is it?</b><span class="pill" id="occPill">–</span></div>
+          <div class="meter" style="margin:8px 0 6px"><i id="occBar"></i></div>
+          <div class="row small muted"><span class="num" id="occText"></span><button class="btn sm sun" id="boardBtn">I'm boarding</button></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Notices</h2></div>
+          <ul class="list" id="notices"></ul>
+        </div>
+        <div class="card">
+          <h2 style="margin-bottom:12px">Tell us how it went</h2>
+          <form class="form" id="fbForm">
+            <div><div class="small" style="font-weight:700;margin-bottom:4px">Rate your ride</div><div class="stars" id="stars" role="radiogroup" aria-label="Rating"></div></div>
+            <label for="fbType">What is this about?
+              <select id="fbType"><option>Feedback</option><option>Complaint: bus was late</option><option>Complaint: too crowded</option><option>Complaint: driver or safety</option><option>Complaint: other</option></select></label>
+            <label for="fbText">Your message<textarea id="fbText" placeholder="Tell the transport office what happened"></textarea></label>
+            <button class="btn" type="submit">Send to transport office</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DRIVER -->
+  <section class="view" id="view-driver" aria-label="Driver view">
+    <div class="grid">
+      <div class="stack">
+        <div class="card">
+          <div class="card-head"><h2>Your bus today</h2><span class="pill sun">Sample driver</span></div>
+          <label for="drvRoute">Assigned route
+            <select id="drvRoute"></select></label>
+          <div class="grid3" style="margin-top:16px">
+            <div class="tile"><span class="muted small">Bus</span><b id="drvBus">–</b></div>
+            <div class="tile"><span class="muted small">Passengers</span><b class="num" id="drvPax">–</b></div>
+            <div class="tile"><span class="muted small">Trip</span><b id="drvTrip">–</b></div>
+          </div>
+          <div class="row" style="margin-top:16px;justify-content:flex-start">
+            <button class="btn" id="tripBtn">Start trip</button>
+            <button class="btn ghost" id="gpsBtn">GPS sharing: on</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2 style="margin-bottom:12px">Update trip status</h2>
+          <div class="row" style="justify-content:flex-start">
+            <button class="btn ghost" data-status="ontime">On time</button>
+            <button class="btn ghost" data-status="delay10">Delayed 10 min</button>
+            <button class="btn ghost" data-status="delay20">Delayed 20 min</button>
+            <button class="btn ghost" data-status="cancel">Cancel trip</button>
+          </div>
+          <p class="muted small" style="margin-top:10px">Students on this route see the change on their Student tab right away.</p>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <h2 style="margin-bottom:12px">Report a problem</h2>
+          <form class="form" id="sosForm">
+            <label for="sosType">Type<select id="sosType"><option>Breakdown</option><option>Accident</option><option>Medical emergency</option><option>Road blocked</option></select></label>
+            <label for="sosText">Details<textarea id="sosText" placeholder="Where are you and what happened?"></textarea></label>
+            <button class="btn bad" type="submit">Alert the transport manager</button>
+          </form>
+        </div>
+        <div class="card">
+          <h2 style="margin-bottom:8px">Next stops</h2>
+          <ol class="list" id="drvStops" style="padding-left:18px;list-style:decimal"></ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADMIN -->
+  <section class="view" id="view-admin" aria-label="Admin view">
+    <div class="tiles" id="tiles" style="margin-bottom:16px"></div>
+    <div class="grid">
+      <div class="stack">
+        <div class="card">
+          <div class="card-head"><h2>Demand forecast</h2><span class="pill sun">AI-assisted estimate</span></div>
+          <div class="row" style="margin-bottom:12px;justify-content:flex-start;gap:16px">
+            <label for="slotSel" style="min-width:150px">Departure time<select id="slotSel"></select></label>
+            <label class="toggle" for="examTgl" style="margin-top:20px"><input type="checkbox" id="examTgl" style="width:20px;height:20px">Exam week (+25% demand)</label>
+          </div>
+          <div class="tablewrap"><table>
+            <thead><tr><th>Route</th><th>Capacity</th><th>Predicted</th><th>Occupancy</th><th>Status</th></tr></thead>
+            <tbody id="fcBody"></tbody></table></div>
+          <p class="muted small" style="margin-top:10px">Predicted occupancy = predicted passengers ÷ bus capacity × 100. Predictions come from sample history and can be wrong. You make the final call.</p>
+        </div>
+        <div class="card">
+          <h2 style="margin-bottom:12px">Bus allocation suggestions</h2>
+          <div class="list" id="recs"></div>
+        </div>
+        <div class="card">
+          <h2 style="margin-bottom:12px">Route use this week</h2>
+          <div class="barchart" id="util"></div>
+          <p class="muted small" style="margin-top:10px">Average occupancy on morning trips. Sample data.</p>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <h2 style="margin-bottom:12px">Send a notice</h2>
+          <form class="form" id="noticeForm">
+            <label for="nRoute">Route<select id="nRoute"></select></label>
+            <label for="nText">Message<textarea id="nText" placeholder="Example: Route C leaves 10 minutes earlier tomorrow."></textarea></label>
+            <button class="btn" type="submit">Publish notice</button>
+          </form>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Complaints and feedback</h2><span class="pill warn" id="openCount"></span></div>
+          <ul class="list" id="complaints"></ul>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Transport report</h2><button class="btn sm" id="repBtn">Generate</button></div>
+          <div class="report muted" id="report">Press Generate to build a summary of routes, forecasts, decisions and complaints.</div>
+          <button class="btn ghost sm" id="copyRep" style="margin-top:10px" hidden>Copy report</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Smart University Transport Management System · Department of Software Engineering, Daffodil International University. Prototype with sample data. AI suggestions are estimates, and a transport manager approves every change.</footer>
+</main>
+<div id="toast" class="toast" hidden></div>
+
+<script src="js/app.js"></script>

@@ -1,0 +1,10 @@
+{
+  "name": "diu-bus-buddy-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "REST API for DIU Bus Buddy (no dependencies; needs Node 22+)",
+  "scripts": {
+    "init-db": "node init-db.js",
+    "start": "node --no-warnings server.js"
+  }
+}
